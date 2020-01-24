@@ -97,6 +97,11 @@ function! g:NERDTreeSvnStatusRefresh()
         if l:pathStr =~# '\.\./.*'
             continue
         endif
+
+        if nerdtree#runningWindows()
+            let l:pathStr = substitute(l:pathStr, '\\', '/', 'g')
+        endif
+
         let l:statusKey = s:NERDTreeGetFileSvnStatusKey(l:statusLine[0])
         let b:NERDTreeCachedSvnFileStatus[fnameescape(l:pathStr)] = l:statusKey
 
