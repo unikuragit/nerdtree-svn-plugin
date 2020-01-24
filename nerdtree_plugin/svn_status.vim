@@ -91,7 +91,7 @@ function! g:NERDTreeSvnStatusRefresh()
             call s:NERDTreeCacheDirtyDir(l:pathSplit[0])
             let l:pathStr = l:pathSplit[1]
         else
-            let l:pathStr = substitute(l:pathSplit[0], '     ', '', '')
+            let l:pathStr = substitute(l:pathSplit[0], '.\{5\}', '', '')
         endif
         let l:pathStr = s:NERDTreeTrimDoubleQuotes(l:pathStr)
         if l:pathStr =~# '\.\./.*'
