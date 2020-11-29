@@ -83,8 +83,16 @@ function! g:NERDTreeSvnStatusRefresh()
     endif
     let b:NOT_A_SVN_REPOSITORY = 0
 
+    let l:status_regex = '^\%([ ACDIMRX?!~]\)\%([ CM]\)\%([ L]\)\%([ +]\)\%([ SX]\)\%([ KOTB]\)\%([ C]\)'
+
     for l:statusLine in l:statusesSplit
         " cache svn status of files
+        if l:statusLine !~# l:status_regex
+          continue
+        endif
+        if has('win32')
+          let l:statusLine = iconv(l:statusLine, 'cp932', &enc)
+        endif
         let l:pathStr = substitute(l:statusLine, '...', '', '')
         let l:pathSplit = split(l:pathStr, ' -> ')
         if len(l:pathSplit) == 2
@@ -145,12 +153,16 @@ function! g:NERDTreeGetSvnStatusPrefix(path)
         call g:NERDTreeSvnStatusRefresh()
     endif
     let l:pathStr = a:path.str()
-    let l:cwd = b:NERDTree.root.path.str() . a:path.Slash()
+    if exists('a:path.Slash')
+        let l:cwd = b:NERDTree.root.path.str() . a:path.Slash()
+    else
+        let l:cwd = b:NERDTree.root.path.str()
+      endif
     if nerdtree#runningWindows()
         let l:pathStr = a:path.WinToUnixPath(l:pathStr)
         let l:cwd = a:path.WinToUnixPath(l:cwd)
     endif
-    let l:pathStr = substitute(l:pathStr, fnameescape(l:cwd), '', '')
+    let l:pathStr = substitute(substitute(l:pathStr, fnameescape(l:cwd), '', ''), '^/', '', '')
     let l:statusKey = ''
     if a:path.isDirectory
         let l:statusKey = get(b:NERDTreeCachedSvnDirtyDir, fnameescape(l:pathStr . '/'), '')
